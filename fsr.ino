@@ -41,7 +41,7 @@
 #endif
 
 // Default threshold value for each of the sensors.
-const int16_t kDefaultThreshold = 1000;
+const int16_t kDefaultThreshold = 100;
 // Max window size for both of the moving averages classes.
 const size_t kWindowSize = 50;
 // Baud rate used for Serial communication. Technically ignored by Teensys.
@@ -308,9 +308,9 @@ class SensorState {
 // Class containing all relevant information per sensor.
 class Sensor {
  public:
-  Sensor(uint8_t pin_value, SensorState* sensor_state = nullptr)
+  Sensor(uint8_t pin_value, uint16_t threshold = kDefaultThreshold, SensorState* sensor_state = nullptr)
       : initialized_(false), pin_value_(pin_value),
-        user_threshold_(kDefaultThreshold),
+        user_threshold_(threshold),
         #if defined(CAN_AVERAGE)
           moving_average_(kWindowSize),
         #endif
@@ -457,10 +457,12 @@ class Sensor {
 // };
 
 Sensor kSensors[] = {
-  Sensor(A0),
-  Sensor(A1),
-  Sensor(A2),
-  Sensor(A3),
+  Sensor(A0 , 493),
+  Sensor(A1, 426),
+  Sensor(A2, 373),
+  Sensor(A3, 400),
+  Sensor(A4, 85),
+  Sensor(A5 , 85),
 };
 const size_t kNumSensors = sizeof(kSensors)/sizeof(Sensor);
 
@@ -568,12 +570,12 @@ void setup() {
   }
   
   #if defined(CLEAR_BIT) && defined(SET_BIT)
-	  // Set the ADC prescaler to 16 for boards that support it,
-	  // which is a good balance between speed and accuracy.
-	  // More information can be found here: http://www.gammon.com.au/adc
-	  SET_BIT(ADCSRA, ADPS2);
-	  CLEAR_BIT(ADCSRA, ADPS1);
-	  CLEAR_BIT(ADCSRA, ADPS0);
+    // Set the ADC prescaler to 16 for boards that support it,
+    // which is a good balance between speed and accuracy.
+    // More information can be found here: http://www.gammon.com.au/adc
+    SET_BIT(ADCSRA, ADPS2);
+    CLEAR_BIT(ADCSRA, ADPS1);
+    CLEAR_BIT(ADCSRA, ADPS0);
   #endif
 }
 
